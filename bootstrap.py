@@ -36,12 +36,14 @@ def main():
     username = USERNAME
     password = None
     if '-env' in sys.argv:
-        username = os.environ['MPYPI_USERNAME']
-        password = os.environ['MPYPI_PASSWORD']
+        username = os.environ['MPYPI_BB_USERNAME']
+        password = os.environ['MPYPI_BB_PASSWORD']
 
     # write PID file
     with pidfile():
-        packages = bitbucket.load_packages(PACKAGES, username=username, email=EMAIL, password=password)
+        packages = []
+        if PACKAGES:
+            packages.extend(bitbucket.load_packages(PACKAGES, username=username, email=EMAIL, password=password))
         packages.extend(EXTRA_PACKAGES)
         mpypi.main(packages, host=HOSTNAME, port=PORT)
 
