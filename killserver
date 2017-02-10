@@ -1,0 +1,33 @@
+#!/bin/bash
+
+# http://redsymbol.net/articles/unofficial-bash-strict-mode/
+set -euo pipefail
+IFS=$'\n\t'
+
+# ------------------------------------------------------------------------------
+# discover where this script is located
+# ------------------------------------------------------------------------------
+myreadlink() {
+  # http://stackoverflow.com/a/17577143
+  (
+  cd $(dirname $1)
+  echo $PWD/$(basename $1)
+  )
+}
+
+# http://stackoverflow.com/a/246128
+SOURCE="${BASH_SOURCE[0]}"
+while [ -h "$SOURCE" ]; do # resolve $SOURCE until the file is no longer a symlink
+  DIR="$( cd -P "$( dirname "$SOURCE" )" && pwd )"
+  SOURCE="$(myreadlink "$SOURCE")"
+  [[ $SOURCE != /* ]] && SOURCE="$DIR/$SOURCE" # if $SOURCE was a relative symlink, we need to resolve it relative to the path where the symlink file was located
+done
+BASEDIR="$( cd -P "$( dirname "$SOURCE" )" && pwd )"
+# ------------------------------------------------------------------------------
+cd "$BASEDIR"
+
+pidfile="$BASEDIR/PID"
+
+if [ -f "$pidfile" ]; then
+   pkill --signal SIGINT -F "$pidfile" 
+fi
