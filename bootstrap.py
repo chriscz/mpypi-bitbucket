@@ -16,6 +16,7 @@ try:
 except ImportError:
     raise ImportError("did you remember to copy default_config.py to config.py?")
 
+BASEDIR = os.path.dirname(os.path.abspath(__file__))    
 
 
 @contextmanager
@@ -23,7 +24,6 @@ def pidfile():
     """
     Creates a PID file and deletes it upon return
     """
-    BASEDIR = os.path.dirname(os.path.abspath(__file__))    
     pidpath = os.path.join(BASEDIR, 'PID')
     with open(pidpath, 'w') as f:
         f.write(str(os.getpid()))
@@ -55,6 +55,8 @@ def main():
 
         if GIT_LOCAL:
             for (package, path) in GIT_LOCAL:
+                with mpypi.cd(BASEDIR):
+                    path = os.path.abspath(path)
                 packages.append(gitrepo.GitRepoPackage(package, path, strip_v=True))
 
         packages.extend(config.EXTRA_PACKAGES)
