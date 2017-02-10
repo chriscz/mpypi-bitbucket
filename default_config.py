@@ -3,11 +3,20 @@ HOSTNAME = "localhost"
 PORT = 7890
 
 # bitbucket credentials
-USERNAME = None
-EMAIL = None
+BB_USERNAME = None
+BB_EMAIL = None
 
-# extra packages (must be a list of mpypi.PackageBase instances)
-
+# extra packages (must be a list of  instances)
+# type: list of mpypi.PackageBase
 EXTRA_PACKAGES = [
+
+]
+
+# see `packages.py` for format information
+BITBUCKET = [
+
+]
+
+GIT_LOCAL = [
 
 ]

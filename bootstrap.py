@@ -2,14 +2,17 @@ from __future__ import print_function
 import sys
 import os
 
-import mpypi
-from mpypi.extension import bitbucket
-from packages import PACKAGES
-
 from contextlib import contextmanager
 
+import packages as pkgconfig
+
+import mpypi
+from mpypi.extension import bitbucket
+from mpypi.extension import gitrepo
+
+
 try:
-    from config import USERNAME, EMAIL, HOSTNAME, PORT, EXTRA_PACKAGES
+    import config
 except ImportError:
     raise ImportError("did you remember to copy default_config.py to config.py?")
 
@@ -33,19 +36,29 @@ def pidfile():
 
 
 def main():
-    username = USERNAME
+    username = config.BB_USERNAME
     password = None
     if '-env' in sys.argv:
         username = os.environ['MPYPI_BB_USERNAME']
         password = os.environ['MPYPI_BB_PASSWORD']
 
+    packages = []
+
     # write PID file
     with pidfile():
-        packages = []
-        if PACKAGES:
-            packages.extend(bitbucket.load_packages(PACKAGES, username=username, email=EMAIL, password=password))
-        packages.extend(EXTRA_PACKAGES)
-        mpypi.main(packages, host=HOSTNAME, port=PORT)
+        BITBUCKET = pkgconfig.BITBUCKET + config.BITBUCKET
+        GIT_LOCAL = pkgconfig.GIT_LOCAL + config.GIT_LOCAL
+
+        if BITBUCKET:
+            bb_pkgs = bitbucket.load_packages(BITBUCKET, username=username, email=config.BB_EMAIL, password=password)
+            packages.extend(bb_pkgs)
+
+        if GIT_LOCAL:
+            for (package, path) in GIT_LOCAL:
+                packages.append(gitrepo.GitRepoPackage(package, path, strip_v=True))
+
+        packages.extend(config.EXTRA_PACKAGES)
+        mpypi.main(packages, host=config.HOSTNAME, port=config.PORT)
 
 
 if __name__ == '__main__':
