@@ -1,5 +1,6 @@
 # user configuration
 config.py
+mpypi.log
 
 # virtualenv
 /venv/

@@ -1,8 +1,11 @@
 #!/bin/bash
+# initializes the project for a new developer
 
 # http://redsymbol.net/articles/unofficial-bash-strict-mode/
 set -euo pipefail
 IFS=$'\n\t'
+
+LOGFILE="mpypi.log"
 
 # ------------------------------------------------------------------------------
 # discover where this script is located
@@ -26,8 +29,9 @@ BASEDIR="$( cd -P "$( dirname "$SOURCE" )" && pwd )"
 # ------------------------------------------------------------------------------
 cd "$BASEDIR"
 
-pidfile="$BASEDIR/PID"
+set +euo pipefail
+source venv/bin/activate
+set -euo pipefail
 
-if [ -f "$pidfile" ]; then
-   pkill --signal SIGTERM -F "$pidfile" 
-fi
+python bootstrap.py $@ &>> $LOGFILE & disown
+exit $?
